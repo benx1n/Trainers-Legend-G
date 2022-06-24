@@ -1,3 +1,8 @@
+# Trainer's Legend G + CarrotJuicer
+### 缝合[EXNOA-CarrotJuicer](https://github.com/CNA-Bld/EXNOA-CarrotJuicer)的抓包、http notifier到umamusume-localify里使解锁帧数、最新汉化可以同时和抓包使用
+适用于于[UmamusumeResponseAnalyzer](https://github.com/UmamusumeResponseAnalyzer/UmamusumeResponseAnalyzer)<br>
+仅个人使用，如果侵权请联系本人删除项目<br>
+以下是原仓库文档<br><br>
 [![Download](https://img.shields.io/github/v/release/MinamiChiwa/umamusume-localify-zh-CN?color=blue&logoColor=white&label=Download&logo=DocuSign)](https://github.com/MinamiChiwa/Trainers-Legend-G/releases/latest)
 [![Chat](https://img.shields.io/badge/Join-QQ%E9%A2%91%E9%81%93-blue?logo=tencent-qq&logoColor=white)](https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=1olqdK&from=246610&biz=ka)
 [![Discord](https://img.shields.io/discord/973208860217200653?color=blue&label=Discord&logo=Discord&logoColor=white)](https://discord.com/invite/TBCSv5hU69)
