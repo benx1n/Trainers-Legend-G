@@ -1,5 +1,6 @@
 #include <stdinclude.hpp>
 #include <unordered_set>
+#include <./carrotjuicer/notifier.hpp>
 
 using namespace std;
 std::function<void()> g_on_hook_ready;
@@ -38,6 +39,97 @@ namespace
 
 		printf("\n\n");
 	}
+		// CarrotJuice
+	std::string current_time()
+	{
+		const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::system_clock::now().time_since_epoch());
+		return std::to_string(ms.count());
+	}
+
+	void write_file(const std::string& file_name, const char* buffer, const int len)
+	{
+		FILE* fp;
+		fopen_s(&fp, file_name.c_str(), "wb");
+		if (fp != nullptr)
+		{
+			fwrite(buffer, 1, len, fp);
+			fclose(fp);
+		}
+	}
+
+
+	void* LZ4_decompress_safe_ext_orig = nullptr;
+
+	int LZ4_decompress_safe_ext_hook(
+		char* src,
+		char* dst,
+		int compressedSize,
+		int dstCapacity)
+	{
+		const int ret = reinterpret_cast<decltype(LZ4_decompress_safe_ext_hook)*>(LZ4_decompress_safe_ext_orig)(
+			src, dst, compressedSize, dstCapacity);
+
+		const std::string data(dst, ret);
+
+		auto notifier_thread = std::thread([&]
+			{
+				notifier::notify_response(data);
+			});
+
+		notifier_thread.join();
+
+		return ret;
+	}
+
+	void* LZ4_compress_default_ext_orig = nullptr;
+
+	int LZ4_compress_default_ext_hook(
+		char* src,
+		char* dst,
+		int srcSize,
+		int dstCapacity)
+	{
+		const int ret = reinterpret_cast<decltype(LZ4_compress_default_ext_hook)*>(LZ4_compress_default_ext_orig)(
+			src, dst, srcSize, dstCapacity);
+		const std::string data(src, srcSize);
+
+		auto notifier_thread = std::thread([&]
+			{
+				notifier::notify_request(data);
+			});
+
+		notifier_thread.join();
+		return ret;
+	}
+	void bootstrap_carrot_juicer()
+	{
+		const auto libnative_module = GetModuleHandle("libnative.dll");
+		printf("libnative.dll at %p\n", libnative_module);
+		if (libnative_module == nullptr)
+		{
+			return;
+		}
+
+		const auto LZ4_decompress_safe_ext_ptr = GetProcAddress(libnative_module, "LZ4_decompress_safe_ext");
+		printf("LZ4_decompress_safe_ext at %p\n", LZ4_decompress_safe_ext_ptr);
+		if (LZ4_decompress_safe_ext_ptr == nullptr)
+		{
+			return;
+		}
+		MH_CreateHook(LZ4_decompress_safe_ext_ptr, LZ4_decompress_safe_ext_hook, &LZ4_decompress_safe_ext_orig);
+		MH_EnableHook(LZ4_decompress_safe_ext_ptr);
+
+		const auto LZ4_compress_default_ext_ptr = GetProcAddress(libnative_module, "LZ4_compress_default_ext");
+		printf("LZ4_compress_default_ext at %p\n", LZ4_compress_default_ext_ptr);
+		if (LZ4_compress_default_ext_ptr == nullptr)
+		{
+			return;
+		}
+		MH_CreateHook(LZ4_compress_default_ext_ptr, LZ4_compress_default_ext_hook, &LZ4_compress_default_ext_orig);
+		MH_EnableHook(LZ4_compress_default_ext_ptr);
+	}
+	//Carrot Juice End
 
 	void* load_library_w_orig = nullptr;
 	HMODULE __stdcall load_library_w_hook(const wchar_t* path)
@@ -46,6 +138,7 @@ namespace
 		if (path == L"cri_ware_unity.dll"sv)
 		{
 			path_game_assembly();
+			bootstrap_carrot_juicer();
 			if (g_on_hook_ready)
 			{
 				g_on_hook_ready();
