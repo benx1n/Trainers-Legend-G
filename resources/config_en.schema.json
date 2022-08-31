@@ -1,5 +1,5 @@
 {
-    "title": "Umamusume Localify Config",
+    "title": "Trainers-Legend-G Config",
     "description": "Umamusume Localify Config",
     "type": "object",
     "properties": {
@@ -16,13 +16,36 @@
             "type": "boolean"
         },
         "maxFps": {
-            "description": "Fps setting (-1 = Default fps|0 = Infinity|>0 = Limit game to specific fps)——Vertical synchronization is enabled",
+            "description": "Fps setting (-1 = Default fps|0 = Infinity|>0 = Limit game to specific fps)",
             "type": "integer",
             "minimum": -1
+        },
+        "highQuality": {
+            "description": "High quality mode (FullQuality, MSAA x8)",
+            "type": "boolean"
+        },
+        "enableVSync": {
+            "description": "Enable vertical synchronization",
+            "type": "boolean"
         },
         "unlockSize": {
             "description": "Allow to use the resolution higher than `1080p`",
             "type": "boolean"
+        },
+        "unlockSizeOffset": {
+            "description": "unlockSize offset",
+            "type": "object",
+            "properties": {
+                "landspace": {
+                    "description": "landspace offset",
+                    "type": "number"
+                },
+                "vertical": {
+                    "description": "vertical offset",
+                    "type": "number"
+                }
+            },
+            "additionalProperties": false
         },
         "uiScale": {
             "description": "Customize the scale of ui (set 0.8 if you find your game windows can't show all the graphic)",
@@ -76,6 +99,78 @@
             "description": "Full screen the game automaticlly.\nIf monitor resolution is 16:9, game will be full screened during watching live/story\nIf monitor resolution is 9:16, game will be full screened in most circumstances",
             "type": "boolean"
         },
+        "live": {
+            "description": "Set Live",
+            "type": "object",
+            "properties": {
+                "free_camera": {
+                    "description": "Enable free camera",
+                    "type": "boolean"
+                },
+                "force_changeVisibility_false": {
+                    "description": "Force disable character visibility changing",
+                    "type": "boolean"
+                },
+                "moveStep": {
+                    "description": "Camera move step",
+                    "type": "number"
+                },
+                "close_all_blur": {
+                    "description": "Disable all blur",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "race_camera": {
+            "description": "Race Camera Settings",
+            "type": "object",
+            "properties": {
+                "free_camera": {
+                    "description": "Enable free camera",
+                    "type": "boolean"
+                },
+                "moveStep": {
+                    "description": "Camera move step",
+                    "type": "number"
+                },
+                "defaultFOV": {
+                    "description": "Default FOV",
+                    "type": "number"
+                },
+                "freecam_lookat_target": {
+                    "description": "Look at Umamusume",
+                    "type": "boolean"
+                },
+                "freecam_follow_target": {
+                    "description": "Move after Umamusume",
+                    "type": "boolean"
+                },
+                "follow_offset": {
+                    "description": "Move offset",
+                    "type": "object",
+                    "properties": {
+                        "distance": {
+                            "description": "Distance from Umamusume",
+                            "type": "number"
+                        },
+                        "x": {
+                            "description": "X offset",
+                            "type": "number"
+                        },
+                        "y": {
+                            "description": "Y offset",
+                            "type": "number"
+                        },
+                        "z": {
+                            "description": "Z offset",
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
         "externalPlugin": {
             "description": "Set external plugin.",
             "type": "object",
@@ -94,6 +189,10 @@
                 }
             },
             "additionalProperties": false
+        },
+        "httpServerPort": {
+            "description": "HTTP Server Port",
+            "type": "integer"
         },
         "autoChangeLineBreakMode": {
             "description": "Automatically toggle \"Ignore line break\" mode based on whether the game is 16:9 or 9:16",

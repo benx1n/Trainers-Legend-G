@@ -6,6 +6,7 @@
 #include <iostream>
 #include <thread>
 #include <format>
+#include <functional>
 
 namespace MHotkey{
     namespace {
@@ -16,6 +17,13 @@ namespace MHotkey{
         std::string umaArgs = "";
         bool openPluginSuccess = false;
         DWORD pluginPID = -1;
+        int tlgport = 43215;
+
+        std::function<void(int, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)> mKeyBoardCallBack = nullptr;
+    }
+
+    void SetKeyCallBack(std::function<void(int, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD)> callbackfun) {
+        mKeyBoardCallBack = callbackfun;
     }
 
     bool check_file_exist(const std::string& name) {
@@ -23,15 +31,15 @@ namespace MHotkey{
         return (stat(name.c_str(), &buffer) == 0);
     }
     
-    void fopenExternalPlugin() {
-        std::thread([](){
+    void fopenExternalPlugin(int tlgPort) {
+        std::thread([tlgPort](){
             if (openPluginSuccess) {
                 printf("External plugin is already open.\n");
                 return;
             }
             openPluginSuccess = true;
 
-            std::string file_check_name = extPluginPath + ".autoupdate";
+            std::string file_check_name = std::format("{}.autoupdate", extPluginPath);
 
             if (MHotkey::extPluginPath == "") {
                 printf("\"externalPlugin\" not found\n");
@@ -47,7 +55,7 @@ namespace MHotkey{
                 }
             }
 
-            std::string cmdLine = extPluginPath + " " + MHotkey::umaArgs;
+            std::string cmdLine = std::format("{} {} --tlgport={}", extPluginPath, MHotkey::umaArgs, tlgPort);
             char* commandLine = new char[255];
             strcpy(commandLine, cmdLine.c_str());
 
@@ -93,9 +101,15 @@ namespace MHotkey{
         DWORD SHIFT_key = 0;
         DWORD CTRL_key = 0;
         DWORD ALT_key = 0;
+        DWORD SPACE_key = 0;
+        DWORD UP_key = 0;
+        DWORD DOWN_key = 0;
+        DWORD LEFT_key = 0;
+        DWORD RIGHT_key = 0;
 
         if ((nCode == HC_ACTION) && ((wParam == WM_SYSKEYDOWN) || (wParam == WM_KEYDOWN)))
         {
+
             KBDLLHOOKSTRUCT hooked_key = *((KBDLLHOOKSTRUCT*)lParam);
             DWORD dwMsg = 1;
             dwMsg += hooked_key.scanCode << 16;
@@ -111,6 +125,16 @@ namespace MHotkey{
             SHIFT_key = GetAsyncKeyState(VK_SHIFT);
             CTRL_key = GetAsyncKeyState(VK_CONTROL);
             ALT_key = GetAsyncKeyState(VK_MENU);
+            SPACE_key = GetAsyncKeyState(VK_SPACE);
+
+            UP_key = GetAsyncKeyState(VK_UP);
+            DOWN_key = GetAsyncKeyState(VK_DOWN);
+            LEFT_key = GetAsyncKeyState(VK_LEFT);
+            RIGHT_key = GetAsyncKeyState(VK_RIGHT);
+
+            if (mKeyBoardCallBack != nullptr) {
+                mKeyBoardCallBack(key, SHIFT_key, CTRL_key, ALT_key, SPACE_key, UP_key, DOWN_key, LEFT_key, RIGHT_key);
+            }
 
             if (key >= 'A' && key <= 'Z')
             {
@@ -119,7 +143,7 @@ namespace MHotkey{
 
                 if (CTRL_key != 0 && key == hotk)
                 {
-                    fopenExternalPlugin();
+                    fopenExternalPlugin(tlgport);
                 }
 
                 // printf("key = %c\n", key);
@@ -127,7 +151,11 @@ namespace MHotkey{
                 SHIFT_key = 0;
                 CTRL_key = 0;
                 ALT_key = 0;
-
+                SPACE_key = 0;
+                DWORD UP_key = 0;
+                DWORD DOWN_key = 0;
+                DWORD LEFT_key = 0;
+                DWORD RIGHT_key = 0;
             }
 
             // printf("lpszKeyName = %s\n", lpszKeyName);
@@ -169,6 +197,9 @@ namespace MHotkey{
     }
     void setUmaCommandLine(std::string args) {
         MHotkey::umaArgs = args;
+    }
+    void setTlgPort(int port) {
+        tlgport = port;
     }
 
     int start_hotkey(char sethotk='u')

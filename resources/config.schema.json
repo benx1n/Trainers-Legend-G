@@ -1,5 +1,5 @@
 {
-    "title": "Umamusume Localify Config",
+    "title": "Trainers-Legend-G Config",
     "description": "赛马娘本地化插件配置",
     "type": "object",
     "properties": {
@@ -16,13 +16,36 @@
             "type": "boolean"
         },
         "maxFps": {
-            "description": "帧率限制 (-1 = 游戏原版/0 = 无限/>0 = 锁定到特定帧数)——注: 垂直同步已开启",
+            "description": "帧率限制 (-1 = 游戏原版/0 = 无限/>0 = 锁定到特定帧数)",
             "type": "integer",
             "minimum": -1
+        },
+        "highQuality": {
+            "description": "高画质模式 (抗锯齿 MSAA x8, 锁定图形质量等级到最高)",
+            "type": "boolean"
+        },
+        "enableVSync": {
+            "description": "开启垂直同步 (开启后 maxFps 设置将会失效)",
+            "type": "boolean"
         },
         "unlockSize": {
             "description": "允许游戏使用`1080p`以上的分辨率",
             "type": "boolean"
+        },
+        "unlockSizeOffset": {
+            "description": "unlockSize 偏移率设置. 当出现点击偏移时可以设置",
+            "type": "object",
+            "properties": {
+                "landspace": {
+                    "description": "横屏状态偏移率",
+                    "type": "number"
+                },
+                "vertical": {
+                    "description": "竖屏状态偏移率",
+                    "type": "number"
+                }
+            },
+            "additionalProperties": false
         },
         "uiScale": {
             "description": "自定义UI缩放",
@@ -76,6 +99,78 @@
             "description": "在屏幕比例对应时自动设置为全屏 (true/false)\n- 如屏幕是16:9 并且横屏，将会在横屏播放剧情/live时全屏\n- 如屏幕是9:16，将会在绝大多数情况下全屏",
             "type": "boolean"
         },
+        "live": {
+            "description": "Live配置",
+            "type": "object",
+            "properties": {
+                "free_camera": {
+                    "description": "启用自由视角",
+                    "type": "boolean"
+                },
+                "force_changeVisibility_false": {
+                    "description": "禁用改变角色可见性",
+                    "type": "boolean"
+                },
+                "moveStep": {
+                    "description": "相机移动步幅",
+                    "type": "number"
+                },
+                "close_all_blur": {
+                    "description": "关闭所有模糊镜头",
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "race_camera": {
+            "description": "比赛相机设置",
+            "type": "object",
+            "properties": {
+                "free_camera": {
+                    "description": "启用自由视角",
+                    "type": "boolean"
+                },
+                "moveStep": {
+                    "description": "相机移动步幅",
+                    "type": "number"
+                },
+                "defaultFOV": {
+                    "description": "默认FOV",
+                    "type": "number"
+                },
+                "freecam_lookat_target": {
+                    "description": "视角随着马娘移动",
+                    "type": "boolean"
+                },
+                "freecam_follow_target": {
+                    "description": "摄像机随着马娘移动",
+                    "type": "boolean"
+                },
+                "follow_offset": {
+                    "description": "摄像机随马娘移动参数",
+                    "type": "object",
+                    "properties": {
+                        "distance": {
+                            "description": "与目标马娘的距离",
+                            "type": "number"
+                        },
+                        "x": {
+                            "description": "x轴偏移",
+                            "type": "number"
+                        },
+                        "y": {
+                            "description": "y轴偏移",
+                            "type": "number"
+                        },
+                        "z": {
+                            "description": "z轴偏移",
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
         "externalPlugin": {
             "description": "外部插件配置",
             "type": "object",
@@ -94,6 +189,10 @@
                 }
             },
             "additionalProperties": false
+        },
+        "httpServerPort": {
+            "description": "HTTP服务器端口, 用于外部插件交互",
+            "type": "integer"
         },
         "autoChangeLineBreakMode": {
             "description": "根据横竖屏模式自动切换\"忽略换行符\"模式",
